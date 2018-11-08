@@ -1,0 +1,10 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+script:
+  - ./gradlew clean build test --stacktrace --info
+
+after_success:
+  - if [ "$TRAVIS_JDK_VERSION" = "oraclejdk8" ]; then ./gradlew jacocoTestReport coveralls; fi;

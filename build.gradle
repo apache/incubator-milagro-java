@@ -1,0 +1,104 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
+    id 'io.codearte.nexus-staging' version '0.11.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.bmuschko.nexus'
+
+nexusStaging {
+    packageGroup = "org.miracl"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId 'milagro-crypto-java'
+            groupId 'org.miracl.milagro.amcl'
+            version '0.4.0'
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url "$buildDir/repo"
+        }
+    }
+}
+
+
+dependencies {
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    api 'org.apache.commons:commons-math3:3.6.1'
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'com.google.guava:guava:23.0'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    jcenter()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+archivesBaseName = 'milagro-crypto-java'
+group = "org.miracl.milagro.amcl"
+version = "0.4.0"
+modifyPom {
+    project {
+        name 'milagro-crypto-java'
+        description 'MCJL - Milagro Crypto Java Library'
+        url 'https://github.com/milagro-crypto/milagro-crypto-java'
+        inceptionYear '2018'
+        scm {
+            url 'https://bitbucket.org/objdict/objjson'
+            connection 'scm:https://github.com/milagro-crypto/milagro-crypto-java.git'
+            developerConnection 'scm:git://github.com/milagro-crypto/milagro-crypto-java.git'
+        }
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        developers {
+            developer {
+                email 'support@miracl.com'
+            }
+        }
+    }
+}
+extraArchive {
+    sources = true
+    tests = true
+    javadoc = true
+}
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+}
